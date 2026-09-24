@@ -343,7 +343,9 @@
         // Draw ribbons
         _onDraw: function() {
             // cleanup on ribbons list to rtemoved finished ribbons
-            for (var i = 0, t = this._ribbons.length; i < t; ++i) {
+            // (walk backwards: splicing while walking forwards skipped the entry after each removal,
+            // so two ribbons finishing in the same frame left a null behind and the next loop threw)
+            for (var i = this._ribbons.length - 1; i >= 0; --i) {
                 if (!this._ribbons[i]) {
                     this._ribbons.splice(i, 1);
                 }
