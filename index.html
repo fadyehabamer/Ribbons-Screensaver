@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -6,12 +7,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="star.png" type="image/x-icon">
     <link rel="stylesheet" href="style.css">
+    <meta name="description" content="A relaxing, endlessly generated low-poly ribbons screensaver drawn on an HTML canvas.">
     <title>ribbons.js</title>
 </head>
 
 <body class="light">
     
-    <button id="button"> <span id="span"> 🌓 </span> </button>
+    <button id="pause" aria-label="Pause animation"> <span aria-hidden="true"> ⏸ </span> </button>
+    <button id="button" aria-label="Toggle light / dark background"> <span id="span" aria-hidden="true"> 🌓 </span> </button>
     <script src="ribbons.js"></script>
     <script src="main.js"></script>
 </body>

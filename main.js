@@ -2,20 +2,23 @@ let button = document.getElementById("button")
 button.addEventListener("click",()=>{
     document.body.classList.toggle("light")
 })
-window.addEventListener("load",()=>{
-    registersw();
+
+// pause / play the ribbons (moving content should be stoppable)
+const pauseButton = document.getElementById("pause")
+function setPaused(paused) {
+    if (paused) {
+        ribbons.pause()
+    } else {
+        ribbons.resume()
+    }
+    pauseButton.setAttribute("aria-label", paused ? "Play animation" : "Pause animation")
+    pauseButton.querySelector("span").textContent = paused ? " ▶ " : " ⏸ "
+}
+pauseButton.addEventListener("click", () => {
+    setPaused(!ribbons.isPaused())
 })
 
-async function registersw(){
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-          navigator.serviceWorker.register('sw.js').then(function(registration) {
-            // Registration was successful
-            console.log('ServiceWorker registration successful with scope: ', registration.scope);
-          }, function(err) {
-            // registration failed :(
-            console.log('ServiceWorker registration failed: ', err);
-          });
-        });
-      }
+// people who ask the OS to reduce motion get a few seconds of ribbons, then a still frame
+if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    setTimeout(() => setPaused(true), 3000)
 }

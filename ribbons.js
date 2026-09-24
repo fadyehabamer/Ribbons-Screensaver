@@ -133,6 +133,8 @@
         this._height = 0;
         this._scroll = 0;
         this._ribbons = [];
+        this._paused = false;
+        this._raf = null;
         this._options = {
             // ribbon color HSL saturation amount
             colorSaturation: "80%",
@@ -343,7 +345,9 @@
         // Draw ribbons
         _onDraw: function() {
             // cleanup on ribbons list to rtemoved finished ribbons
-            for (var i = 0, t = this._ribbons.length; i < t; ++i) {
+            // (walk backwards: splicing while walking forwards skipped the entry after each removal,
+            // so two ribbons finishing in the same frame left a null behind and the next loop threw)
+            for (var i = this._ribbons.length - 1; i >= 0; --i) {
                 if (!this._ribbons[i]) {
                     this._ribbons.splice(i, 1);
                 }
@@ -373,7 +377,24 @@
             if (this._ribbons.length < this._options.ribbonCount) {
                 this.addRibbon();
             }
-            requestAnimationFrame(this._onDraw);
+            if (!this._paused) {
+                this._raf = requestAnimationFrame(this._onDraw);
+            }
+        },
+
+        // Stop / restart the animation loop (the current frame stays on the canvas)
+        pause: function() {
+            this._paused = true;
+            cancelAnimationFrame(this._raf);
+        },
+        resume: function() {
+            if (this._paused) {
+                this._paused = false;
+                this._onDraw();
+            }
+        },
+        isPaused: function() {
+            return this._paused;
         },
 
         // Update container size info
@@ -388,6 +409,10 @@
 
                 if (this._context) {
                     this._context.globalAlpha = this._options.colorAlpha;
+                    // resizing clears the canvas; repaint once so a paused screen isn't left blank
+                    if (this._paused) {
+                        this._onDraw();
+                    }
                 }
             }
         },
@@ -404,7 +429,7 @@
     return Factory;
 });
 
-new Ribbons({
+var ribbons = new Ribbons({
     colorSaturation: "60%",
     colorBrightness: "50%",
     colorAlpha: 0.3,
